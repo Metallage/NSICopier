@@ -5,6 +5,8 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Threading;
+using System.Xml;
+using System.Xml.XPath;
 
 namespace NSICopier
 {
@@ -19,12 +21,15 @@ namespace NSICopier
         //Путь к 7z 
         string archiver;
 
+        /// <summary>
+        /// Массив целевых папок
+        /// </summary>
+        List<NSIDestination> destinations = new List<NSIDestination>();
+
 
         public Logica()
         {
-            tempPath = @"c:\temp\copyNsi\";
-            sourceFiles = @"c:\temp\fromNsi\";
-            archiver = @"C:\temp\unp\7z\7z.exe";
+            ParseSettings("Settings.xml");
 
             if(!Directory.Exists(tempPath))
             {
@@ -32,23 +37,29 @@ namespace NSICopier
             }
         }
 
+        /// <summary>
+        /// Копируем всё 
+        /// </summary>
         public void copyToAll()
         {
             string archPATH = tempPath + "archNSI_" + DateTime.Now.ToShortDateString() + ".7z";
 
             AddToArchive(archiver,sourceFiles+"*.*",archPATH);
 
-            List<NSIDestination> destinations = new List<NSIDestination>();
-
-            NSIDestination nsiDes = new NSIDestination(@"c:\temp\nsiout\", false);
-            destinations.Add(nsiDes);
-
-            foreach(NSIDestination destination in destinations)
+            foreach(NSIDestination destination in this.destinations)
             {
                 destination.CopyToDestination(sourceFiles, archPATH);
             }
         }
-
+        
+        
+        
+        /// <summary>
+        /// Нашел в гугле, функция для архивании с помощью 7z
+        /// </summary>
+        /// <param name="archiver">путь к архиватору</param>
+        /// <param name="fileNames">файлы которые нужно загнать в архив (можно *.*)</param>
+        /// <param name="archiveName">путь к архиву</param>
         private void AddToArchive(string archiver, string fileNames, string archiveName)
         {
             try
@@ -104,5 +115,45 @@ namespace NSICopier
             }
         }
 
+        /// <summary>
+        /// Чтение настроек из XML
+        /// </summary>
+        /// <param name="fileName">xml файл с настройками</param>
+        private void ParseSettings(string fileName)
+        {
+            //Читаем и определяем корень
+            XmlDocument settings = new XmlDocument();
+            settings.Load(fileName); 
+            XmlElement rootSetting = settings.DocumentElement;
+
+            //Чтение параметров временной папки
+            XmlNode tempSetting = rootSetting.SelectSingleNode("//options/temp");
+            tempPath = tempSetting.InnerText;
+
+            //Чтение параметров папки с файлами для копирования
+            XmlNode sourceSetting = rootSetting.SelectSingleNode("//options/source");
+            sourceFiles = sourceSetting.InnerText;
+
+            //Чтение пути к архиватору
+            XmlNode archiverSetting = rootSetting.SelectSingleNode("//options/archiver");
+            archiver = archiverSetting.InnerText;
+
+            //Чтение настроек целевых папок
+            XmlNodeList destinations = rootSetting.SelectNodes("//destinations/destination");
+
+            foreach(XmlNode destination in destinations)
+            {
+                bool needArch = false;
+
+                if(destination.SelectSingleNode("needArch").InnerText.ToLower() == "yes")
+                {
+                    needArch = true;
+                }
+
+                this.destinations.Add(new NSIDestination(destination.SelectSingleNode("directory").InnerText, needArch));
+                
+            }
+
+        }
     }
 }

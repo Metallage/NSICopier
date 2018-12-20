@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace NSICopier
 {
@@ -11,8 +12,15 @@ namespace NSICopier
         {
             try
             {
-                Logica nsiSender = new Logica();
-                nsiSender.copyToAll();
+                if (File.Exists("Settings.xml"))
+                {
+                    Logica nsiSender = new Logica();
+                    nsiSender.copyToAll();
+                }
+                else
+                {
+                    Console.WriteLine("Settings.xml не найден");
+                }
             }
             catch(Exception e)
             {

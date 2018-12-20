@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<settings>
+  <options>
+    <source>c:\temp\fromNsi\</source>
+    <temp>c:\temp\copyNsi\</temp>
+    <archiver>7z\7z.exe</archiver>
+  </options>
+  <destinations>
+    <destination name="RCED">
+      <directory>c:\temp\nsiout\</directory>
+      <needArch>no</needArch>
+    </destination>
+	<destination name="MTP">
+      <directory>c:\temp\nsiout2\</directory>
+      <needArch>yes</needArch>
+    </destination>
+	<destination name="RTP">
+      <directory>c:\temp\nsiout3\</directory>
+      <needArch>yes</needArch>
+    </destination>
+  </destinations>
+</settings>
