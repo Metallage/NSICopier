@@ -40,16 +40,37 @@ namespace NSICopier
             return exists;
         }
 
-        private void CopyToDestination(string file)
+       public void CopyToDestination(string sourceDir, string archPath)
         {
-            FileInfo copingFile = new FileInfo(file);
-            FileInfo destFile = new FileInfo(destinationPath + copingFile.Name);
-            copingFile.CopyTo(destFile.FullName, true);
-            //FileStream fsCopy = new FileStream(destFile.FullName, FileMode.Truncate);
-            //if(fsCopy.CanWrite)
-            //{
-            //    fsCopy.Wri
-            //}
+            bool isPossible = CreateOrCheckDestination();
+
+            if(isPossible)
+            {
+                if(needArch)
+                {
+                    FileInfo archNSI = new FileInfo(archPath);
+                    CopyArch(archNSI);
+                }
+                else
+                {
+                    DirectoryInfo sDir = new DirectoryInfo(sourceDir);
+                    CopyNoArch(sDir);
+                }
+            }
+
+        }
+
+        private void CopyArch(FileInfo archNSI)
+        {
+            archNSI.CopyTo(destinationPath + archNSI.Name);
+        }
+
+        private void CopyNoArch(DirectoryInfo dir)
+        {
+            foreach(FileInfo nsiFile in dir.GetFiles())
+            {
+                nsiFile.CopyTo(destinationPath+nsiFile.Name);
+            }
 
         }
 
