@@ -12,14 +12,20 @@ namespace NSICopier
         {
             try
             {
-                if (File.Exists("Settings.xml"))
+                string settingsPath = "Settings.xml";
+                if (args.Length > 0)
                 {
-                    Logica nsiSender = new Logica();
+                    settingsPath = args[0];
+                }
+
+                if (File.Exists(settingsPath))
+                {
+                    Logica nsiSender = new Logica(settingsPath);
                     nsiSender.copyToAll();
                 }
                 else
                 {
-                    Console.WriteLine("Settings.xml не найден");
+                    Console.WriteLine(settingsPath + " не найден");
                 }
             }
             catch(Exception e)

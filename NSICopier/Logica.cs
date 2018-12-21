@@ -27,9 +27,9 @@ namespace NSICopier
         List<NSIDestination> destinations = new List<NSIDestination>();
 
 
-        public Logica()
+        public Logica(string settingsPath)
         {
-            ParseSettings("Settings.xml");
+            ParseSettings(settingsPath);
 
             if(!Directory.Exists(tempPath))
             {
@@ -50,6 +50,8 @@ namespace NSICopier
             {
                 destination.CopyToDestination(sourceFiles, archPATH);
             }
+
+            ClearAll();
         }
         
         
@@ -153,7 +155,23 @@ namespace NSICopier
                 this.destinations.Add(new NSIDestination(destination.SelectSingleNode("directory").InnerText, needArch));
                 
             }
+        }
 
+        /// <summary>
+        /// Удаляет исходники и темпы
+        /// </summary>
+        private void ClearAll()
+        {
+            DirectoryInfo scf = new DirectoryInfo(sourceFiles);
+            foreach(FileInfo fi in scf.GetFiles())
+            {
+                fi.Delete();
+            }
+            DirectoryInfo tmp = new DirectoryInfo(tempPath);
+            foreach(FileInfo fi2 in tmp.GetFiles())
+            {
+                fi2.Delete();
+            }           
         }
     }
 }
