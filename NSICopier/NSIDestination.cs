@@ -62,14 +62,32 @@ namespace NSICopier
 
         private void CopyArch(FileInfo archNSI)
         {
-            archNSI.CopyTo(destinationPath + archNSI.Name);
+            if (!File.Exists(destinationPath + archNSI.Name))
+            {
+                archNSI.CopyTo(destinationPath + archNSI.Name);
+            }
+            else
+            {
+                archNSI.CopyTo(destinationPath + archNSI.Name + "_" + DateTime.Now.TimeOfDay.ToString() + "." + archNSI.Extension);
+            }
         }
 
         private void CopyNoArch(DirectoryInfo dir)
         {
             foreach(FileInfo nsiFile in dir.GetFiles())
             {
-                nsiFile.CopyTo(destinationPath+nsiFile.Name);
+                if (!File.Exists(destinationPath + nsiFile.Name))
+                {
+                    nsiFile.CopyTo(destinationPath + nsiFile.Name);
+                }
+                else
+                {
+                    FileInfo concurentFile = new FileInfo(destinationPath + nsiFile.Name);
+                    if(nsiFile.LastWriteTime>concurentFile.LastWriteTime)
+                    {
+                        nsiFile.CopyTo(destinationPath + nsiFile.Name, true);
+                    }
+                }
             }
 
         }
