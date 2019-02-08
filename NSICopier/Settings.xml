@@ -4,6 +4,7 @@
     <source>c:\temp\fromNsi\</source>
     <temp>c:\temp\copyNsi\</temp>
     <archiver>7z\7z.exe</archiver>
+    <clearSource>yes</clearSource>
   </options>
   <destinations>
     <destination name="RCED">

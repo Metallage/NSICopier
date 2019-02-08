@@ -26,6 +26,8 @@ namespace NSICopier
         /// </summary>
         List<NSIDestination> destinations = new List<NSIDestination>();
 
+        bool clearSource = false;
+
 
         public Logica(string settingsPath)
         {
@@ -140,6 +142,14 @@ namespace NSICopier
             XmlNode archiverSetting = rootSetting.SelectSingleNode("//options/archiver");
             archiver = archiverSetting.InnerText;
 
+            //Нужно ли удалять исходники
+            XmlNode clearSetting = rootSetting.SelectSingleNode("//options/clearSource");
+            if (clearSetting.InnerText.ToLower() == "yes")
+            {
+                clearSource = true;
+            }
+            
+
             //Чтение настроек целевых папок
             XmlNodeList destinations = rootSetting.SelectNodes("//destinations/destination");
 
@@ -162,11 +172,15 @@ namespace NSICopier
         /// </summary>
         private void ClearAll()
         {
-            DirectoryInfo scf = new DirectoryInfo(sourceFiles);
-            foreach(FileInfo fi in scf.GetFiles())
+            if (clearSource)
             {
-                fi.Delete();
+                DirectoryInfo scf = new DirectoryInfo(sourceFiles);
+                foreach (FileInfo fi in scf.GetFiles())
+                {
+                    fi.Delete();
+                }
             }
+
             DirectoryInfo tmp = new DirectoryInfo(tempPath);
             foreach(FileInfo fi2 in tmp.GetFiles())
             {
